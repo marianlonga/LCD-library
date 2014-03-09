@@ -55,6 +55,8 @@ _Note: all settings and their descriptions are in `LCD-library.h`_
 Example
 -------
 
+###Code
+
 ```c
 #include <xc.h>
 #include "LCD-library.h"
@@ -98,3 +100,7 @@ int main() {
     while(1);
 }
 ```
+
+###Photo
+
+![Example photo](https://raw.github.com/marianlonga/LCD-library/master/img/LCD-example.jpg)
