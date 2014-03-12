@@ -99,6 +99,14 @@ void LCD_blinkCursor();
 void LCD_stopCursorBlinking();
 // displays an integer (type: *int*; range -32767, 32767)
 void LCD_displayNumber(long int);
+// move cursor to the left
+void LCD_moveLeft();
+// move cursor to the right
+void LCD_moveRight();
+// move cursor up
+void LCD_moveUp();
+// move cursor down
+void LCD_moveDown();
 
 
 #ifdef	__cplusplus

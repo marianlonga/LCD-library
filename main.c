@@ -15,30 +15,13 @@
 void delay_ms(int ms) {for(int i = 0; i < ms; i++) __delay_ms(1);}
 
 int main() {
-    // Initializes LCD with settings from `LCD-library.h`
     LCD_init();
 
-    // Write "Hello, World!" starting at (2nd column, 1st row)
-    LCD_setCursor(2,1);
-    LCD_displayString("Hello, World!");
-
-    // Display characters 'a', '!' and '$' on positions (3,2), (4,2), (5,2)
-    LCD_setCursor(3,2);
-    LCD_displayChar('a');
-    LCD_displayChar('!');
-    LCD_displayChar('$');
-
-    // Write number -123 starting at (7th column, 2nd row)
-    LCD_setCursor(7,2);
-    LCD_displayNumber(-123);
-
-    // In one second intervals display numbers 1-10 at position (12,2)
-    for(int i = 1; i <= 10; i++) {
-        LCD_setCursor(13,2);
-        LCD_displayNumber(i);
-        LCD_delay_ms(1000);
-    }
-
-    // Wait infinitely long
+    LCD_setCursor(5,1);
+    LCD_displayChar('1'); LCD_moveLeft();
+    LCD_moveDown(); LCD_displayChar('2'); LCD_moveLeft();
+    LCD_moveLeft(); LCD_displayChar('3'); LCD_moveLeft();
+    LCD_moveUp(); LCD_displayChar('4'); LCD_moveLeft();
+    
     while(1);
 }

@@ -72,6 +72,8 @@ void LCD_init() {
 //display char on LCD
 void LCD_displayChar(char inputChar) {
     LCD_code(0b1000000000 + inputChar); // char is an 8bit binary ASCII code, compatible with character codes which can be displayed on HD44780
+    // move cursor based on the increment/decrement setting
+    if(LCD_isIncrement) LCD_posX++; else LCD_posX--;
 }
 
 // displays string
@@ -93,11 +95,14 @@ void LCD_displayNumber(long int number) {
     LCD_displayString(strNumber);
 }
 
-void LCD_clear() {LCD_code(0b0000000001);}
+void LCD_clear() {
+    LCD_code(0b0000000001); // clear display
+    LCD_posX = LCD_posY = 1; // cursor is reset to (1,1)
+}
 
 // if display is turned on, turn it off
 // display OFF, cursor OFF, blinking OFF
-void LCD_off()   {
+void LCD_off() {
     if(LCD_isDisplayOn) {
         LCD_code(0b0000001000);
         LCD_isDisplayOn = FALSE;
@@ -113,16 +118,23 @@ void LCD_on() {
 }
 
 void LCD_setCursor(int pos, int row) {
-    switch(row) {
-        case 1:  LCD_code(0b0010000000 + 0x00 + (pos-1)); break;
-        case 2:  LCD_code(0b0010000000 + 0x40 + (pos-1)); break;
-        //case  3: LCD_code(0b0010000000 + 0x14 + (pos-1)); break;
-        //case  4: LCD_code(0b0010000000 + 0x54 + (pos-1)); break;
-        default: LCD_code(0b0010000000 + 0x00 + (pos-1)); break; // default is 1st row
+    if(pos >= 1 && pos <= LCD_columns && row >= 1 && row <= LCD_rows){ // is the chosen cursor position in range?
+        LCD_posX = pos; // set the variables
+        LCD_posY = row;
+        switch(row) { // set the DDRAMA address in LCD
+            case 1:  LCD_code(0b0010000000 + 0x00 + (pos-1)); break;
+            case 2:  LCD_code(0b0010000000 + 0x40 + (pos-1)); break;
+            //case  3: LCD_code(0b0010000000 + 0x14 + (pos-1)); break;
+            //case  4: LCD_code(0b0010000000 + 0x54 + (pos-1)); break;
+            default: LCD_code(0b0010000000 + 0x00 + (pos-1)); break; // default is 1st row
+        }
     }
 }
 
-void LCD_home() {LCD_code(0b0000000010);}
+void LCD_home() {
+    LCD_code(0b0000000010);
+    LCD_posX = LCD_posY = 1; // cursor is reset to (1,1)
+}
 
 void LCD_cursorOff() {
     if(LCD_isCursorOn) {
@@ -149,5 +161,33 @@ void LCD_stopCursorBlinking() {
     if(!LCD_isCursorBlinking) {
         LCD_code(0b0000001001 + (LCD_isDisplayOn<<2) + (LCD_isCursorOn<<1));
         LCD_isCursorBlinking = TRUE;
+    }
+}
+
+void LCD_moveLeft() {
+    if(LCD_posX -1 >= 1) {
+        LCD_posX--; 
+        LCD_setCursor(LCD_posX, LCD_posY);
+    }
+}
+
+void LCD_moveRight() {
+    if(LCD_posX +1 <= LCD_columns) {
+        LCD_posX++;
+        LCD_setCursor(LCD_posX, LCD_posY);
+    }
+}
+
+void LCD_moveUp() {
+    if(LCD_posY -1 >= 1) {
+        LCD_posY--;
+        LCD_setCursor(LCD_posX, LCD_posY);
+    }
+}
+
+void LCD_moveDown() {
+    if(LCD_posY +1 <= LCD_rows) {
+        LCD_posY++;
+        LCD_setCursor(LCD_posX, LCD_posY);
     }
 }
