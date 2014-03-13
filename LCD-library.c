@@ -164,30 +164,30 @@ void LCD_stopCursorBlinking() {
     }
 }
 
-void LCD_moveLeft() {
-    if(LCD_posX -1 >= 1) {
-        LCD_posX--; 
+void LCD_moveLeft(int howMuch) {
+    if(LCD_posX -howMuch >= 1) {
+        LCD_posX -= howMuch;
         LCD_setCursor(LCD_posX, LCD_posY);
     }
 }
 
-void LCD_moveRight() {
-    if(LCD_posX +1 <= LCD_columns) {
-        LCD_posX++;
+void LCD_moveRight(int howMuch) {
+    if(LCD_posX +howMuch <= LCD_columns) {
+        LCD_posX += howMuch;
         LCD_setCursor(LCD_posX, LCD_posY);
     }
 }
 
-void LCD_moveUp() {
-    if(LCD_posY -1 >= 1) {
-        LCD_posY--;
+void LCD_moveUp(int howMuch) {
+    if(LCD_posY -howMuch >= 1) {
+        LCD_posY -= howMuch;
         LCD_setCursor(LCD_posX, LCD_posY);
     }
 }
 
-void LCD_moveDown() {
-    if(LCD_posY +1 <= LCD_rows) {
-        LCD_posY++;
+void LCD_moveDown(int howMuch) {
+    if(LCD_posY +howMuch <= LCD_rows) {
+        LCD_posY += howMuch;
         LCD_setCursor(LCD_posX, LCD_posY);
     }
 }

@@ -17,11 +17,10 @@ void delay_ms(int ms) {for(int i = 0; i < ms; i++) __delay_ms(1);}
 int main() {
     LCD_init();
 
-    LCD_setCursor(5,1);
-    LCD_displayChar('1'); LCD_moveLeft();
-    LCD_moveDown(); LCD_displayChar('2'); LCD_moveLeft();
-    LCD_moveLeft(); LCD_displayChar('3'); LCD_moveLeft();
-    LCD_moveUp(); LCD_displayChar('4'); LCD_moveLeft();
+    LCD_setCursor(5,1); LCD_displayChar('1'); LCD_moveLeft(1);
+    LCD_moveDown(1);    LCD_displayChar('2'); LCD_moveLeft(1);
+    LCD_moveLeft(1);    LCD_displayChar('3'); LCD_moveLeft(1);
+    LCD_moveUp(1);      LCD_displayChar('4'); LCD_moveLeft(1);
     
     while(1);
 }
