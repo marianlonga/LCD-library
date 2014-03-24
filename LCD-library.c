@@ -48,7 +48,7 @@ void LCD_init() {
     if(LCD_data_length == 8) {
 
         // Official init starts here
-        LCD_delay_ms(20);
+        LCD_delay_ms(50);
         LCD_codeNoWait(0b0000100000 + (LCD_dl<<4) + (LCD_n<<3) + (LCD_f<<2)); // set function set
         LCD_delay_ms(10);
         LCD_codeNoWait(0b0000100000 + (LCD_dl<<4) + (LCD_n<<3) + (LCD_f<<2)); // set function set
@@ -92,6 +92,13 @@ void LCD_typewriteString(const char *str, int delay) {
 void LCD_displayNumber(long int number) {
     char strNumber[20];
     itoa(strNumber, number, 10); // convert int to string
+    LCD_displayString(strNumber);
+}
+
+void LCD_displayNumberRight(long int number) {
+    char strNumber[20];
+    itoa(strNumber, number, 10); // convert int to string
+    LCD_moveLeft(strlen(strNumber)-1);
     LCD_displayString(strNumber);
 }
 

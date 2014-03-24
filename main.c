@@ -1,4 +1,4 @@
-/* Copyright (c) 2014 Marian Longa. All rights reserved. 
+/* Copyright (c) 2014 Marian Longa. All rights reserved.
  * http://marianlonga.com, http://github.com/marianlonga/LCD-display */
 
 #include <xc.h>
@@ -17,10 +17,12 @@ void delay_ms(int ms) {for(int i = 0; i < ms; i++) __delay_ms(1);}
 int main() {
     LCD_init();
 
-    LCD_setCursor(5,1); LCD_displayChar('1'); LCD_moveLeft(1);
-    LCD_moveDown(1);    LCD_displayChar('2'); LCD_moveLeft(1);
-    LCD_moveLeft(1);    LCD_displayChar('3'); LCD_moveLeft(1);
-    LCD_moveUp(1);      LCD_displayChar('4'); LCD_moveLeft(1);
-    
+    LCD_setCursor(10,1);
+    for(int i = 0; i < 100000; i++) {
+        LCD_displayNumberRight(i);
+        LCD_moveLeft(1);
+        LCD_delay_ms(10);
+    }
+
     while(1);
 }

@@ -99,6 +99,8 @@ void LCD_blinkCursor();
 void LCD_stopCursorBlinking();
 // displays an integer (type: *int*; range -32767, 32767)
 void LCD_displayNumber(long int);
+// displays an integer right justified (type: *int*; range -32767, 32767)
+void LCD_displayNumberRight(long int);
 // move cursor to the left by number of positions specified
 void LCD_moveLeft(int);
 // move cursor to the right by number of positions specified
