@@ -44,7 +44,7 @@ _Note: all prototypes of functions and their descriptions are in `LCD-library.h`
 _Note: all settings and their descriptions are in `LCD-library.h`_
 - Set pins connected to LCD (data, busy flag, rs, rw, en)
 - Choose between reading busy flag or delaying after command execution
-- ~~Select data length (4 bits, 8 bits)~~ _Not implemented yet, only 8 bit interface availabe!_
+- Select data length (4 bits, 8 bits) _NEW: just implemented 4-bit data length!_
 - Set font (5x8 dots, 5x10 dots)
 - Set number of rows of LCD
 - Set inital cursor position
