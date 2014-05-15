@@ -8,31 +8,78 @@ void LCD_delay_us(int us) {for(int i = 0; i < us; i++) __delay_us(1);}
 void LCD_delay_ms(int ms) {for(int i = 0; i < ms; i++) __delay_ms(1);}
 void LCD_delay_s(int s)   {for(int i = 0; i < s; i++) for(int j = 0; j < 1000; j++) __delay_ms(1);}
 
-void LCD_wait() { // I must read the busy flag between en=HIGH and en=LOW
+void LCD_wait() {
     if(LCD_USE_BUSY_FLAG) {
-        LCD_data_dir = 0xFF; // set RD to input pins
-        LCD_rs       = 0; // command register
-        LCD_rw       = 1; // read
+        if(LCD_data_length == 8) {
+            LCD_data_dir = 0xFF; // set RD to input pins
+            LCD_rs       = 0; // command register
+            LCD_rw       = 1; // read
 
-        LCD_en = 1;
-        while(LCD_busy) { LCD_en=0; LCD_en=1;}
+            // I must read the busy flag between en=HIGH and en=LOW
+            LCD_en = 1; LCD_delay(2);
+            while(LCD_busy) {
+                LCD_en=0; LCD_delay(2);
+                LCD_en=1; LCD_delay(2);
+            }
+            LCD_en = 0; LCD_delay(2);
 
-        LCD_data_dir = 0x00; // set RD back to outputs
+            LCD_data_dir = 0x00; // set RD back to outputs
+        }
+        else if(LCD_data_length == 4) {
+            LCD_data_dir |= 0b11110000; // set upper 4 bits of data register to input pins
+            LCD_rs       = 0; // command register
+            LCD_rw       = 1; // read
+
+            // I must read the busy flag from the high nibble between en=HIGH and en=LOW. I must also read the low nibble (and ignore it).
+            LCD_en = 1; LCD_delay(2);
+            while(LCD_busy) {
+                LCD_en=0; LCD_delay(2);
+                LCD_en=1; LCD_delay(2);
+                LCD_en=0; LCD_delay(2);
+                LCD_en=1; LCD_delay(2);
+            }
+            LCD_en=0; LCD_delay(2);
+            LCD_en=1; LCD_delay(2);
+            LCD_en=0; LCD_delay(2);
+            
+            LCD_data_dir &= 0b00001111; // set upper 4 bits of data register back to outputs
+          
+        }
     }
     else LCD_delay_us(LCD_command_delay);
 }
 
-void LCD_codeNoWait(int code) {
+void LCD_8bitCodeNoWait(int code) {
     LCD_rs   = (code & 0b1000000000) >> 9;
     LCD_rw   = (code & 0b0100000000) >> 8;
     LCD_data =  code & 0b0011111111;
     LCD_en   = 1; // enable pin HIGH-->LOW
     LCD_en   = 0;
 }
+void LCD_8bitCode(int code) {
+    LCD_8bitCodeNoWait(code);
+    LCD_wait();
+}
+
+void LCD_4bitCodeNoWait(int code) { // USES HIGHEST 4 BITS OF DATA REGISTER!
+    LCD_rs   = (code & 0b100000) >> 5;
+    LCD_rw   = (code & 0b010000) >> 4;
+    LCD_data &= 0b00001111; // clear highest 4 bits of data register (where we'll send data)
+    LCD_data |= (code & 0b001111) << 4; // put the data to highest 4 bits of data register
+    LCD_en   = 1; // enable pin HIGH-->LOW
+    LCD_en   = 0;
+}
+void LCD_4bitCode(int code) {
+    LCD_4bitCodeNoWait(code);
+    LCD_wait();
+}
 
 void LCD_code(int code) {
-    LCD_codeNoWait(code);
-    LCD_wait();
+    if(LCD_data_length == 8) LCD_8bitCode(code);
+    if(LCD_data_length == 4) {
+        LCD_4bitCode(code >> 4); // upper nibble is executed
+        LCD_4bitCode(((code & 0b1100000000)>>4) + (code & 0b1111)); // lower nibble is executed
+    }
 }
 
 void LCD_init() {
@@ -49,24 +96,43 @@ void LCD_init() {
 
         // Official init starts here
         LCD_delay_ms(50);
-        LCD_codeNoWait(0b0000100000 + (LCD_dl<<4) + (LCD_n<<3) + (LCD_f<<2)); // set function set
+        LCD_8bitCodeNoWait(0b0000100000 + (LCD_dl<<4) + (LCD_n<<3) + (LCD_f<<2)); // set function set
         LCD_delay_ms(10);
-        LCD_codeNoWait(0b0000100000 + (LCD_dl<<4) + (LCD_n<<3) + (LCD_f<<2)); // set function set
+        LCD_8bitCodeNoWait(0b0000100000 + (LCD_dl<<4) + (LCD_n<<3) + (LCD_f<<2)); // set function set
         LCD_delay_us(200);
-        LCD_codeNoWait(0b0000100000 + (LCD_dl<<4) + (LCD_n<<3) + (LCD_f<<2)); // set function set
+        LCD_8bitCodeNoWait(0b0000100000 + (LCD_dl<<4) + (LCD_n<<3) + (LCD_f<<2)); // set function set
 
-        LCD_code(0b0000100000 + (LCD_dl<<4) + (LCD_n<<3) + (LCD_f<<2)); // set function set // 8 bits, 2 lines, 5x8 dots
-        LCD_code(0b0000001000); // display OFF
-        LCD_code(0b0000000001); // clear display
-        LCD_code(0b0000000100 + (LCD_isIncrement<<1) + LCD_isShift); // set entry mode // cursor increment, no display shift
+        LCD_delay_us(200); // although not in datasheet, this delay is necessary for initialization
+
+        LCD_8bitCode(0b0000100000 + (LCD_dl<<4) + (LCD_n<<3) + (LCD_f<<2)); // set function set
+        LCD_8bitCode(0b0000001000); // display OFF
+        LCD_8bitCode(0b0000000001); // clear display
+        LCD_8bitCode(0b0000000100 + (LCD_isIncrement<<1) + LCD_isShift); // set entry mode
         // Official init ends here
 
-        LCD_code(0b0000001000 + (LCD_isDisplayOn<<2) + (LCD_isCursorOn<<1) + LCD_isCursorBlinking); // display ON, cursor ON, cursor not blinking
-        LCD_setCursor(LCD_posX, LCD_posY); // set initial position of cursor
+        LCD_8bitCode(0b0000001000 + (LCD_isDisplayOn<<2) + (LCD_isCursorOn<<1) + LCD_isCursorBlinking); // display ON, cursor ON, cursor not blinking
     }
     else if(LCD_data_length == 4) {
-        // TODO: make init for 4bit interface
+        // Official init starts here
+        LCD_delay_ms(50);
+        LCD_4bitCodeNoWait(0b000011); // set function set
+        LCD_delay_ms(10);
+        LCD_4bitCodeNoWait(0b000011); // set function set
+        LCD_delay_us(200);
+        LCD_4bitCodeNoWait(0b000011); // set function set
+
+        LCD_delay_us(200); // although not in datasheet, this delay is necessary for initialization
+
+        LCD_4bitCode(0b000010); // set function set // 4 bits
+        LCD_4bitCode(0b000010); LCD_4bitCode(0b000000 + (LCD_n<<3) + (LCD_f<<2));  // set function set // 4 bits
+        LCD_4bitCode(0b000000); LCD_4bitCode(0b001000); // display OFF
+        LCD_4bitCode(0b000000); LCD_4bitCode(0b000001); // clear display
+        LCD_4bitCode(0b000000); LCD_4bitCode(0b000100 + (LCD_isIncrement<<1) + LCD_isShift); // set entry mode
+        // Official init ends here
+
+        LCD_4bitCode(0b000000); LCD_4bitCode(0b001000 + (LCD_isDisplayOn<<2) + (LCD_isCursorOn<<1) + LCD_isCursorBlinking); // display on/off control
     }
+    LCD_setCursor(LCD_posX, LCD_posY); // set initial position of cursor
 }
 
 //display char on LCD

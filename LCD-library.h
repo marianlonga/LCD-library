@@ -17,7 +17,7 @@ extern "C" {
 // crystal/oscillator frequency used for waits in Hz (default: 20000000)
 #define _XTAL_FREQ 20000000
 
-// wait by reading busy flag (1) or wait "LCD_command_delay" microseconds using LCD_delay (0)
+// [1] wait by reading busy flag (1) or wait "LCD_command_delay" microseconds using LCD_delay (0)
 #define LCD_USE_BUSY_FLAG 1
 #define LCD_command_delay 500 // [500] amount of time to wait for LCD to process a command in us
 
@@ -26,11 +26,12 @@ extern "C" {
 #define LCD_rows    2
 
 // set data length: 8 - 8bit, 4 - 4bit
-// WARNING: 4bit IS NOT IMPLEMENTED! USE 8bit INSTEAD!
-#define LCD_data_length 8
+#define LCD_data_length 4
 
 // set font: 10 - 5x10 dots, 8 - 5x8 dots
 #define LCD_font 8
+
+// Note for 4-bit data length: the LCD uses highest 4 bits of LCD_data for communication. Lower 4 bits can be used for other purposes.
 
 // pins (PORT)
 #define LCD_data PORTD
@@ -65,14 +66,25 @@ void LCD_delay_us(int);
 void LCD_delay_ms(int);
 // waits given number of seconds
 void LCD_delay_s(int);
+
 // used after command execution to wait for busy flag to become High-->Low, or, if set, waits LCD_command delay microseconds
 void LCD_wait();
-// executes a code in the form [RS][RW][DB7][DB6][DB5][DB4][DB3][DB2][DB1][DB0] and DOESN'T call LCD_wait() afterwards
-void LCD_codeNoWait(int);
-// executes a code in the form [RS][RW][DB7][DB6][DB5][DB4][DB3][DB2][DB1][DB0] and calls LCD_wait() afterwards
+
+// Functions executing 8 bit code on 8 bit data length (used only in initialization)
+// code is in the form [RS][RW][DB7][DB6][DB5][DB4][DB3][DB2][DB1][DB0]
+void LCD_8bitCodeNoWait(int);
+void LCD_8bitCode(int); // additionally calls LCD_wait() afterwards
+// Functions executing (nibbled) 4 bit code on 4 bit data length (used only in initialization)
+// code is in the form [RS][RW][DB7][DB6][DB5][DB4]
+void LCD_4bitCodeNoWait(int);
+void LCD_4bitCode(int); // additionally calls LCD_wait() afterwards
+// Generic code function for execution of *8bit* code on 4 bit and 8 bit data lengths
+// code is in the form [RS][RW][DB7][DB6][DB5][DB4][DB3][DB2][DB1][DB0] and calls LCD_wait() afterwards
 void LCD_code(int);
+
 // initializes LCD based on settings LCD_rows, LCD_data_length, LCD_font; LCD_increment, LCD_shift; LCD_displayOn, LCD_cursorOn, LCD_cursorBlinking
 void LCD_init();
+
 // displays a given character on position of cursor
 void LCD_displayChar(char);
 // displays a given string starting on position of cursor
@@ -109,7 +121,6 @@ void LCD_moveRight(int);
 void LCD_moveUp(int);
 // move cursor down by number of positions specified
 void LCD_moveDown(int);
-
 
 #ifdef	__cplusplus
 }

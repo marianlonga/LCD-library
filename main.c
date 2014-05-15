@@ -17,12 +17,11 @@ void delay_ms(int ms) {for(int i = 0; i < ms; i++) __delay_ms(1);}
 int main() {
     LCD_init();
 
-    LCD_setCursor(10,1);
-    for(int i = 0; i < 100000; i++) {
-        LCD_displayNumberRight(i);
-        LCD_moveLeft(1);
-        LCD_delay_ms(10);
-    }
+    LCD_setCursor(3,1);
+    LCD_displayString("Now has 4-bit");
+    LCD_setCursor(5,2);
+    LCD_displayString("support!");
 
     while(1);
+
 }
