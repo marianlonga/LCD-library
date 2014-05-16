@@ -52,11 +52,12 @@ extern "C" {
 #define FALSE 0                       // [default value] description
 int LCD_posX             = 1,         // [1]     starting position in row (ex. 1,2,3,...)
     LCD_posY             = 1,         // [1]     starting row number (1,2,3,4)
-    LCD_isIncrement      = TRUE,      // [TRUE]  TRUE - increment, FALSE - decrement
-    LCD_isShift          = FALSE,     // [FALSE] TRUE - shift ON, FLASE - shift OFF
-    LCD_isDisplayOn      = TRUE,      // [TRUE]  TRUE - display ON, FALSE - display OFF
-    LCD_isCursorOn       = TRUE,      // [TRUE]  TRUE - cursor displayed, FALSE - not showed
-    LCD_isCursorBlinking = FALSE;     // [FALSE] TRUE - cursor blinks, FALSE - cursor doesn't blink
+    LCD_isIncrement      = TRUE,      // [TRUE]  TRUE  - increment, FALSE - decrement
+    LCD_isShift          = FALSE,     // [FALSE] TRUE  - shift ON, FLASE - shift OFF
+    LCD_isDisplayOn      = TRUE,      // [TRUE]  TRUE  - display ON, FALSE - display OFF
+    LCD_isCursorOn       = TRUE,      // [TRUE]  TRUE  - cursor displayed, FALSE - not showed
+    LCD_isCursorBlinking = FALSE,     // [FALSE] TRUE  - cursor blinks, FALSE - cursor doesn't blink
+    LCD_isCursorMoving   = FALSE;     // [FALSE] TRUE  - after displaying characters, cursor moves left/right based on LCD_isIncrement value, FALSE - after displaying characters, cursor doesn't move
 
 // waits given number of instruction cycles
 void LCD_delay(int);

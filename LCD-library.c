@@ -138,21 +138,50 @@ void LCD_init() {
 //display char on LCD
 void LCD_displayChar(char inputChar) {
     LCD_code(0b1000000000 + inputChar); // char is an 8bit binary ASCII code, compatible with character codes which can be displayed on HD44780
-    // move cursor based on the increment/decrement setting
+    // update cursor position based on the increment/decrement setting
     if(LCD_isIncrement) LCD_posX++; else LCD_posX--;
+    // if we don't want cursor to move, its position is returned back
+    if(!LCD_isCursorMoving) {
+        if(LCD_isIncrement) LCD_moveLeft(1);
+        else LCD_moveRight(1);
+    }
 }
 
 // displays string
 void LCD_displayString(const char *str) {
-    for(int i = 0; i < strlen(str); i++) LCD_displayChar(str[i]);
+    // if cursor isn't moving, save initial (x,y) position
+    int initialX = LCD_posX;
+    int initialY = LCD_posY;
+
+    for(int i = 0; i < strlen(str); i++) {
+        LCD_displayChar(str[i]);
+        // if we don't want cursor to move, it will display all characters on one place so we must move it
+        if(!LCD_isCursorMoving) {
+            if(LCD_isIncrement) LCD_moveRight(1);
+            else LCD_moveLeft(1);
+        }
+    }
+    // if cursor isn't moving, return cursor back to initial position
+    if(!LCD_isCursorMoving) LCD_setCursor(initialX, initialY);
 }
 
 // displays string waiting "delay" milliseconds after each letter
 void LCD_typewriteString(const char *str, int delay) {
+    // if cursor isn't moving, save initial (x,y) position
+    int initialX = LCD_posX;
+    int initialY = LCD_posY;
+
     for(int i = 0; i < strlen(str); i++) {
         LCD_displayChar(str[i]);
+        // if we don't want cursor to move, it will display all characters on one place so we must move it
+        if(!LCD_isCursorMoving) {
+            if(LCD_isIncrement) LCD_moveRight(1);
+            else LCD_moveLeft(1);
+        }
         LCD_delay_ms(delay);
     }
+    // if cursor isn't moving, return cursor back to initial position
+    if(!LCD_isCursorMoving) LCD_setCursor(initialX, initialY);
 }
 
 void LCD_displayNumber(long int number) {
@@ -166,6 +195,7 @@ void LCD_displayNumberRight(long int number) {
     itoa(strNumber, number, 10); // convert int to string
     LCD_moveLeft(strlen(strNumber)-1);
     LCD_displayString(strNumber);
+    if(!LCD_isCursorMoving) LCD_moveRight(strlen(strNumber)-1);
 }
 
 void LCD_clear() {

@@ -15,13 +15,20 @@
 void delay_ms(int ms) {for(int i = 0; i < ms; i++) __delay_ms(1);}
 
 int main() {
+
     LCD_init();
 
-    LCD_setCursor(3,1);
-    LCD_displayString("Now has 4-bit");
-    LCD_setCursor(5,2);
-    LCD_displayString("support!");
+    LCD_setCursor(6,1);
+    LCD_displayNumber(5678);
+    
+    LCD_moveDown(1);
+    LCD_displayNumberRight(1234);
 
     while(1);
 
+    // The above will produce following output:
+    // +----------------+
+    // |     5678       |
+    // |  1234          |
+    // +----------------+
 }
