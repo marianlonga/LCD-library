@@ -42,10 +42,10 @@ extern "C" {
 
 // direction of pins (TRIS)
 #define LCD_data_dir TRISD
-#define LCD_busy_dir TRISDbits.RD7
-#define LCD_rs_dir   TRISBbits.RB0
-#define LCD_rw_dir   TRISBbits.RB1
-#define LCD_en_dir   TRISBbits.RB2
+#define LCD_busy_dir TRISDbits.TRISD7
+#define LCD_rs_dir   TRISBbits.TRISB0
+#define LCD_rw_dir   TRISBbits.TRISB1
+#define LCD_en_dir   TRISBbits.TRISB2
 
 // set default values for variables
 #define TRUE  1
